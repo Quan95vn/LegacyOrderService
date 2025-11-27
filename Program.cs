@@ -8,38 +8,80 @@ namespace LegacyOrderService
         static void Main(string[] args)
         {
             Console.WriteLine("Welcome to Order Processor!");
-            Console.WriteLine("Enter customer name:");
-            string name = Console.ReadLine();
 
-            Console.WriteLine("Enter product name:");
-            string product = Console.ReadLine();
-            var productRepo = new ProductRepository();
-            double price = productRepo.GetPrice(product);
+            while (true)
+            {
+                string name = GetValidStringInput("Enter customer name: ");
+                string product = GetValidStringInput("Enter product name: ");
 
+                var productRepo = new ProductRepository();
+                double price = productRepo.GetPrice(product);
 
-            Console.WriteLine("Enter quantity:");
-            int qty = Convert.ToInt32(Console.ReadLine());
+                int qty = GetValidIntInput("Enter quantity: ");
 
-            Console.WriteLine("Processing order...");
+                Console.WriteLine("Processing order...");
 
-            Order order = new Order();
-            order.CustomerName = name;
-            order.ProductName = product;
-            order.Quantity = qty;
-            order.Price = 10.0;
+                Order order = new Order();
+                order.CustomerName = name;
+                order.ProductName = product;
+                order.Quantity = qty;
+                order.Price = price;
 
-            double total = order.Quantity * order.Price;
+                double total = order.Quantity * order.Price;
 
-            Console.WriteLine("Order complete!");
-            Console.WriteLine("Customer: " + order.CustomerName);
-            Console.WriteLine("Product: " + order.ProductName);
-            Console.WriteLine("Quantity: " + order.Quantity);
-            Console.WriteLine("Total: $" + price);
+                var repo = new OrderRepository();
+                repo.Save(order);
+                Console.WriteLine("Saving order to database...");
 
-            Console.WriteLine("Saving order to database...");
-            var repo = new OrderRepository();
-            repo.Save(order);
-            Console.WriteLine("Done.");
+                Console.WriteLine("Order complete!");
+                Console.WriteLine("Customer: " + order.CustomerName);
+                Console.WriteLine("Product: " + order.ProductName);
+                Console.WriteLine("Quantity: " + order.Quantity);
+                Console.WriteLine("Total: $" + total);
+
+                Console.WriteLine("Order processed successfully.");
+                Console.Write("Do you want to process another order? (y/n): ");
+                string? choice = Console.ReadLine();
+
+                if (string.IsNullOrWhiteSpace(choice) || !choice.Trim().Equals("y", StringComparison.OrdinalIgnoreCase))
+                {
+                    Console.WriteLine("Exiting application. Goodbye!");
+                    break;
+                }
+            }
+
+            static string GetValidStringInput(string prompt)
+            {
+                string? input = "";
+                while (string.IsNullOrWhiteSpace(input))
+                {
+                    Console.Write(prompt);
+                    input = Console.ReadLine();
+                }
+                return input;
+            }
+
+            static int GetValidIntInput(string prompt)
+            {
+                while (true)
+                {
+                    Console.Write(prompt);
+                    string? input = Console.ReadLine();
+
+                    if (int.TryParse(input, out int value))
+                    {
+                        if (value > 0)
+                        {
+                            return value;
+                        }
+                        Console.WriteLine("Quantity must be greater than 0.");
+                    }
+                    else
+                    {
+                        Console.WriteLine("Invalid input. Please enter a valid number.");
+                    }
+                }
+            }
         }
     }
 }
