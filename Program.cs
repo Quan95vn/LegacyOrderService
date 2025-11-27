@@ -21,11 +21,13 @@ namespace LegacyOrderService
 
                 Console.WriteLine("Processing order...");
 
-                Order order = new Order();
-                order.CustomerName = name;
-                order.ProductName = product;
-                order.Quantity = qty;
-                order.Price = price;
+                Order order = new Order
+                {
+                    CustomerName = name,
+                    ProductName = product,
+                    Quantity = qty,
+                    Price = price
+                };
 
                 double total = order.Quantity * order.Price;
 
