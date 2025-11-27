@@ -10,26 +10,37 @@ namespace LegacyOrderService.Data
 
         public void Save(Order order)
         {
-            var connection = new SqliteConnection(_connectionString);
-            
-            connection.Open();
+            using (var connection = new SqliteConnection(_connectionString))
+            {
+                connection.Open();
 
-            var command = connection.CreateCommand();
-            command.CommandText = $@"
-                INSERT INTO Orders (CustomerName, ProductName, Quantity, Price)
-                VALUES ('{order.CustomerName}', '{order.ProductName}', {order.Quantity}, {order.Price})";
+                using (var command = connection.CreateCommand())
+                {
+                    command.CommandText = @"
+                        INSERT INTO Orders (CustomerName, ProductName, Quantity, Price)
+                        VALUES (@customerName, @productName, @quantity, @price)";
 
-            command.ExecuteNonQuery();            
+                    command.Parameters.AddWithValue("@customerName", order.CustomerName);
+                    command.Parameters.AddWithValue("@productName", order.ProductName);
+                    command.Parameters.AddWithValue("@quantity", order.Quantity);
+                    command.Parameters.AddWithValue("@price", order.Price);
+
+                    command.ExecuteNonQuery();
+                }
+            }
         }
 
         public void SeedBadData()
         {
-            var connection = new SqliteConnection(_connectionString);            
-            connection.Open();
-            var cmd = connection.CreateCommand();
-            cmd.CommandText = "INSERT INTO Orders (CustomerName, ProductName, Quantity, Price) VALUES ('John', 'Widget', 9999, 9.99)";
-            cmd.ExecuteNonQuery();
-            
+            using (var connection = new SqliteConnection(_connectionString))
+            {
+                connection.Open();
+                using (var cmd = connection.CreateCommand())
+                {
+                    cmd.CommandText = "INSERT INTO Orders (CustomerName, ProductName, Quantity, Price) VALUES ('John', 'Widget', 9999, 9.99)";
+                    cmd.ExecuteNonQuery();
+                }
+            }
         }
     }
 }
