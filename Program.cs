@@ -1,4 +1,3 @@
-using System;
 using LegacyOrderService.Models;
 using LegacyOrderService.Data;
 
