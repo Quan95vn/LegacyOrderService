@@ -4,23 +4,18 @@ namespace LegacyOrderService.Data;
 
 public class ProductRepository : IProductRepository
 {
-    //private readonly Dictionary<string, double> _productPrices = new()
-    //{
-    //    ["Widget"] = 12.99,
-    //    ["Gadget"] = 15.49,
-    //    ["Doohickey"] = 8.75
-    //};
+    private readonly OrderDbContext _context;
+
+    public ProductRepository(OrderDbContext context)
+    {
+        _context = context;
+    }
 
     public double? GetPrice(string productName)
     {
-        // Simulate an expensive lookup
-        Thread.Sleep(500);
+        var product = _context.Products
+                .FirstOrDefault(p => p.Name.ToLower() == productName.ToLower());
 
-        if (ProductSeedData.Products.TryGetValue(productName, out var price))
-        {
-            return price;
-        }
-
-        return null;
+        return product?.Price;
     }
 }

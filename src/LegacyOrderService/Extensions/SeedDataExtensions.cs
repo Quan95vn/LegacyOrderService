@@ -2,22 +2,15 @@
 using LegacyOrderService.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Serilog.Core;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace LegacyOrderService.Extensions;
 
 public static class SeedDataExtensions
 {
-    public static void Seed(IHost host)
+    public static void SeedData(IServiceProvider serviceProvider)
     {
-        using (var scope = host.Services.CreateScope())
+        using (var scope = serviceProvider.CreateScope())
         {
             var services = scope.ServiceProvider;
 
@@ -25,7 +18,7 @@ public static class SeedDataExtensions
             {
                 var context = services.GetRequiredService<OrderDbContext>();
                 var logger = services.GetRequiredService<ILogger<Program>>();
-                context.Database.Migrate();
+                context.Database.EnsureCreated();
 
                 if (context.Products.Any())
                 {

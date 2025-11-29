@@ -1,9 +1,13 @@
 using LegacyOrderService.Common;
 using LegacyOrderService.Data;
+using LegacyOrderService.Extensions;
 using LegacyOrderService.Interfaces;
 using LegacyOrderService.Models;
 using LegacyOrderService.Services;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Serilog;
 
@@ -13,18 +17,26 @@ namespace LegacyOrderService
     {
         static void Main(string[] args)
         {
+            var configuration = new ConfigurationBuilder()
+                .SetBasePath(Directory.GetCurrentDirectory())
+                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+                .Build();
+
             Log.Logger = new LoggerConfiguration()
                 .MinimumLevel.Information()
-                .WriteTo.Console() 
-                .WriteTo.File("logs/log-.txt", rollingInterval: RollingInterval.Day) 
+                .WriteTo.Console()
+                .WriteTo.File("logs/log-.txt", rollingInterval: RollingInterval.Day)
                 .CreateLogger();
 
             var services = new ServiceCollection();
             services.AddLogging(builder =>
             {
-                builder.ClearProviders(); 
-                builder.AddSerilog(); 
+                builder.ClearProviders();
+                builder.AddSerilog();
             });
+
+            services.AddDbContext<OrderDbContext>(options =>
+                options.UseSqlite(configuration.GetConnectionString("DefaultConnection")));
 
             services.AddTransient<IProductRepository, ProductRepository>();
             services.AddTransient<IOrderRepository, OrderRepository>();
@@ -32,6 +44,7 @@ namespace LegacyOrderService
 
             var serviceProvider = services.BuildServiceProvider();
 
+            SeedDataExtensions.SeedData(serviceProvider);
 
             var orderService = serviceProvider.GetRequiredService<OrderService>();
             var appLogger = serviceProvider.GetRequiredService<ILogger<Program>>();
@@ -64,9 +77,9 @@ namespace LegacyOrderService
                     {
                         WriteWarning($"Order Failed: {result.ErrorMessage}");
                     }
-                  
+
                     Console.Write("Do you want to process another order? (y/n): ");
-                    
+
                     string? choice = Console.ReadLine();
                     if (string.IsNullOrWhiteSpace(choice) || !choice.Trim().Equals("y", StringComparison.OrdinalIgnoreCase))
                     {
