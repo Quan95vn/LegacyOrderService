@@ -1,4 +1,5 @@
 ﻿using LegacyOrderService.Interfaces;
+using Microsoft.EntityFrameworkCore;
 
 namespace LegacyOrderService.Data;
 
@@ -11,10 +12,10 @@ public class ProductRepository : IProductRepository
         _context = context;
     }
 
-    public double? GetPrice(string productName)
+    public async Task<double?> GetPriceAsync(string productName, CancellationToken cancellationToken = default)
     {
-        var product = _context.Products
-                .FirstOrDefault(p => p.Name.ToLower() == productName.ToLower());
+        var product = await _context.Products
+            .FirstOrDefaultAsync(p => p.Name == productName, cancellationToken);
 
         return product?.Price;
     }

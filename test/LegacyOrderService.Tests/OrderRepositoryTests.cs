@@ -2,6 +2,7 @@
 using LegacyOrderService.Data;
 using LegacyOrderService.Models;
 using Microsoft.EntityFrameworkCore;
+using Moq;
 
 namespace LegacyOrderService.Tests;
 
@@ -29,16 +30,16 @@ public class OrderRepositoryTests
     }
 
     [Fact]
-    public void Save_ShouldPersistOrderToDatabase()
+    public async Task Save_ShouldPersistOrderToDatabase()
     {
         // ARRANGE
         var orderInput = _orderFaker.Generate();
 
         // ACT
-        _repo.Save(orderInput);
+        await _repo.SaveAsync(orderInput, It.IsAny<CancellationToken>());
 
         // ASSERT
-        var savedOrder = _context.Orders.FirstOrDefault();
+        var savedOrder = await _context.Orders.FirstOrDefaultAsync();
 
         Assert.NotNull(savedOrder); 
         Assert.Equal(1, _context.Orders.Count()); 

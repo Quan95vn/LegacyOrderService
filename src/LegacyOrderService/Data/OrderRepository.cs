@@ -12,9 +12,9 @@ public class OrderRepository : IOrderRepository
         _context = context;
     }
 
-    public void Save(Order order)
+    public async Task SaveAsync(Order order, CancellationToken cancellationToken = default)
     {
-        _context.Orders.Add(order);
-        _context.SaveChanges();
+        await _context.Orders.AddAsync(order, cancellationToken);
+        await _context.SaveChangesAsync(cancellationToken);
     }
 }

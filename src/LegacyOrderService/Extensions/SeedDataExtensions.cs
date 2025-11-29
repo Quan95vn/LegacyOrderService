@@ -8,7 +8,7 @@ namespace LegacyOrderService.Extensions;
 
 public static class SeedDataExtensions
 {
-    public static void SeedData(IServiceProvider serviceProvider)
+    public static async Task SeedDataAsync(IServiceProvider serviceProvider)
     {
         using (var scope = serviceProvider.CreateScope())
         {
@@ -18,9 +18,9 @@ public static class SeedDataExtensions
             {
                 var context = services.GetRequiredService<OrderDbContext>();
                 var logger = services.GetRequiredService<ILogger<Program>>();
-                context.Database.EnsureCreated();
+                await context.Database.EnsureCreatedAsync();
 
-                if (context.Products.Any())
+                if (await context.Products.AnyAsync())
                 {
                     return;
                 }
@@ -34,7 +34,7 @@ public static class SeedDataExtensions
                 };
 
                 context.Products.AddRange(products);
-                context.SaveChanges();
+                await context.SaveChangesAsync();
                 logger.LogInformation("Seeding done.");
             }
             catch (Exception ex)

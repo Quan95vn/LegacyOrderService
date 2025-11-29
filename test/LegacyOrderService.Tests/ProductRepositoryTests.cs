@@ -2,6 +2,7 @@
 using LegacyOrderService.Data;
 using LegacyOrderService.Models;
 using Microsoft.EntityFrameworkCore;
+using Moq;
 
 namespace LegacyOrderService.Tests;
 
@@ -35,7 +36,7 @@ public class ProductRepositoryTests
     }
 
     [Fact]
-    public void GetPrice_GivenExistingProduct_ShouldReturnCorrectPrice()
+    public async Task GetPrice_GivenExistingProduct_ShouldReturnCorrectPrice()
     {
         // ARRANGE
         var availableProducts = ProductSeedData.Products.Keys.ToList();
@@ -43,7 +44,7 @@ public class ProductRepositoryTests
         var expectedPrice = ProductSeedData.Products[productName];
 
         // ACT
-        var result = _repo.GetPrice(productName);
+        var result = await _repo.GetPriceAsync(productName, It.IsAny<CancellationToken>());
 
         // ASSERT
         Assert.NotNull(result);
@@ -51,13 +52,13 @@ public class ProductRepositoryTests
     }
 
     [Fact]
-    public void GetPrice_GivenNonExistentProduct_ShouldReturnNull()
+    public async Task GetPrice_GivenNonExistentProduct_ShouldReturnNull()
     {
         // ARRANGE
         var randomProduct = _faker.Commerce.ProductName();
 
         // ACT
-        var result = _repo.GetPrice(randomProduct);
+        var result = await _repo.GetPriceAsync(randomProduct, It.IsAny<CancellationToken>());
 
         // ASSERT
         Assert.Null(result);

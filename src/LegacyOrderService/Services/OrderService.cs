@@ -21,11 +21,15 @@ public class OrderService
         _logger = logger;
     }
 
-    public Result<Order> ProcessOrder(string customerName, string productName, long quantity)
+    public async Task<Result<Order>> ProcessOrderAsync(
+        string customerName, 
+        string productName, 
+        long quantity,
+        CancellationToken cancellationToken = default)
     {
         try
         {
-            double? price = _productRepo.GetPrice(productName);
+            double? price = await _productRepo.GetPriceAsync(productName, cancellationToken);
 
             if (price == null)
             {
@@ -40,7 +44,7 @@ public class OrderService
                 Quantity = quantity,
                 Price = price.Value
             };
-            _orderRepo.Save(order);
+            await _orderRepo.SaveAsync(order, cancellationToken);
 
             double total = order.TotalAmount;
             _logger.LogInformation("Order processed successfully for Customer: {Customer}, Product: {Product}, Quantity: {Quantity}, Total Amount: ${TotalAmount}", 
@@ -48,7 +52,12 @@ public class OrderService
 
             return Result<Order>.Success(order);
         }
-        catch(Exception ex)
+        catch (OperationCanceledException ex)
+        {
+            _logger.LogError("Order processing was canceled: {ex}.", ex);
+            throw;
+        }
+        catch (Exception ex)
         {
             _logger.LogError(ex, "Failed to process order for {CustomerName}", customerName);
             throw;
