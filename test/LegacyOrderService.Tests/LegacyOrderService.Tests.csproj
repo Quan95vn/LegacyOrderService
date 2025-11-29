@@ -21,7 +21,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\LegacyOrderService\LegacyOrderService.csproj" />
+    <ProjectReference Include="..\..\src\LegacyOrderService\LegacyOrderService.csproj" />
   </ItemGroup>
 
   <ItemGroup>
