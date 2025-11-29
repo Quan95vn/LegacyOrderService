@@ -1,0 +1,43 @@
+name: .NET Core CI
+
+on:
+  push:
+    branches: [ "master", "main" ]
+    paths-ignore: 
+      - '**.md'
+      - 'docs/**'
+  pull_request:
+    branches: [ "master", "main" ]
+    paths-ignore:
+      - '**.md'
+      - 'docs/**'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 8.0.x
+
+    - name: Cache NuGet packages
+      uses: actions/cache@v3
+      with:
+        path: ~/.nuget/packages
+        key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj') }}
+        restore-keys: |
+          ${{ runner.os }}-nuget-
+
+    - name: Restore dependencies
+      run: dotnet restore ./LegacyOrderService.sln 
+
+    - name: Build
+      run: dotnet build ./LegacyOrderService.sln --no-restore --configuration Release
+
+    - name: Test
+      run: dotnet test ./LegacyOrderService.sln --no-build --configuration Release --verbosity normal
