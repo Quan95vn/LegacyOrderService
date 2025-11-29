@@ -4,5 +4,5 @@ namespace LegacyOrderService.Interfaces;
 
 public interface IOrderRepository
 {
-    void Save(Order order);
+    Task SaveAsync(Order order, CancellationToken cancellationToken = default);
 }

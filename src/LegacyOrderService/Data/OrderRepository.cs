@@ -1,4 +1,3 @@
-using Microsoft.Data.Sqlite;
 using LegacyOrderService.Models;
 using LegacyOrderService.Interfaces;
 
@@ -6,41 +5,16 @@ namespace LegacyOrderService.Data;
 
 public class OrderRepository : IOrderRepository
 {
-    private string _connectionString = $"Data Source={Path.Combine(AppContext.BaseDirectory, "orders.db")}";
+    private readonly OrderDbContext _context;
 
-
-    public void Save(Order order)
+    public OrderRepository(OrderDbContext context)
     {
-        using (var connection = new SqliteConnection(_connectionString))
-        {
-            connection.Open();
-
-            using (var command = connection.CreateCommand())
-            {
-                command.CommandText = @"
-                        INSERT INTO Orders (CustomerName, ProductName, Quantity, Price)
-                        VALUES (@customerName, @productName, @quantity, @price)";
-
-                command.Parameters.AddWithValue("@customerName", order.CustomerName);
-                command.Parameters.AddWithValue("@productName", order.ProductName);
-                command.Parameters.AddWithValue("@quantity", order.Quantity);
-                command.Parameters.AddWithValue("@price", order.Price);
-
-                command.ExecuteNonQuery();
-            }
-        }
+        _context = context;
     }
 
-    public void SeedBadData()
+    public async Task SaveAsync(Order order, CancellationToken cancellationToken = default)
     {
-        using (var connection = new SqliteConnection(_connectionString))
-        {
-            connection.Open();
-            using (var cmd = connection.CreateCommand())
-            {
-                cmd.CommandText = "INSERT INTO Orders (CustomerName, ProductName, Quantity, Price) VALUES ('John', 'Widget', 9999, 9.99)";
-                cmd.ExecuteNonQuery();
-            }
-        }
+        await _context.Orders.AddAsync(order, cancellationToken);
+        await _context.SaveChangesAsync(cancellationToken);
     }
 }

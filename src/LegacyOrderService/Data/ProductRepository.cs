@@ -1,26 +1,22 @@
 ﻿using LegacyOrderService.Interfaces;
+using Microsoft.EntityFrameworkCore;
 
 namespace LegacyOrderService.Data;
 
 public class ProductRepository : IProductRepository
 {
-    //private readonly Dictionary<string, double> _productPrices = new()
-    //{
-    //    ["Widget"] = 12.99,
-    //    ["Gadget"] = 15.49,
-    //    ["Doohickey"] = 8.75
-    //};
+    private readonly OrderDbContext _context;
 
-    public double? GetPrice(string productName)
+    public ProductRepository(OrderDbContext context)
     {
-        // Simulate an expensive lookup
-        Thread.Sleep(500);
+        _context = context;
+    }
 
-        if (ProductSeedData.Products.TryGetValue(productName, out var price))
-        {
-            return price;
-        }
+    public async Task<double?> GetPriceAsync(string productName, CancellationToken cancellationToken = default)
+    {
+        var product = await _context.Products
+            .FirstOrDefaultAsync(p => p.Name == productName, cancellationToken);
 
-        return null;
+        return product?.Price;
     }
 }

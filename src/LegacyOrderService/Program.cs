@@ -1,8 +1,10 @@
-using LegacyOrderService.Common;
 using LegacyOrderService.Data;
+using LegacyOrderService.Extensions;
 using LegacyOrderService.Interfaces;
-using LegacyOrderService.Models;
 using LegacyOrderService.Services;
+using LegacyOrderService.Utils;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Serilog;
@@ -11,20 +13,28 @@ namespace LegacyOrderService
 {
     class Program
     {
-        static void Main(string[] args)
+        static async Task Main(string[] args)
         {
+            var configuration = new ConfigurationBuilder()
+                .SetBasePath(Directory.GetCurrentDirectory())
+                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+                .Build();
+
             Log.Logger = new LoggerConfiguration()
                 .MinimumLevel.Information()
-                .WriteTo.Console() 
-                .WriteTo.File("logs/log-.txt", rollingInterval: RollingInterval.Day) 
+                .WriteTo.Console()
+                .WriteTo.File("logs/log-.txt", rollingInterval: RollingInterval.Day)
                 .CreateLogger();
 
             var services = new ServiceCollection();
             services.AddLogging(builder =>
             {
-                builder.ClearProviders(); 
-                builder.AddSerilog(); 
+                builder.ClearProviders();
+                builder.AddSerilog();
             });
+
+            services.AddDbContext<OrderDbContext>(options =>
+                options.UseSqlite(configuration.GetConnectionString("DefaultConnection")));
 
             services.AddTransient<IProductRepository, ProductRepository>();
             services.AddTransient<IOrderRepository, OrderRepository>();
@@ -32,6 +42,7 @@ namespace LegacyOrderService
 
             var serviceProvider = services.BuildServiceProvider();
 
+            await SeedDataExtensions.SeedDataAsync(serviceProvider);
 
             var orderService = serviceProvider.GetRequiredService<OrderService>();
             var appLogger = serviceProvider.GetRequiredService<ILogger<Program>>();
@@ -39,34 +50,57 @@ namespace LegacyOrderService
             appLogger.LogInformation("Application Starting...");
             Console.WriteLine("Welcome to Order Processor!");
 
+            using var cts = new CancellationTokenSource();
+
+            Console.CancelKeyPress += (s, e) =>
+            {
+                e.Cancel = true; 
+                cts.Cancel();
+
+                ConsoleHelper.WriteWarning("\nShutdown requested. Waiting for pending tasks...");
+
+                Task.Run(async () =>
+                {
+                    try
+                    {
+                        await Task.Delay(3000);
+                    }
+                    finally
+                    {
+                        ConsoleHelper.WriteError("Force exiting application.");
+                        Environment.Exit(0);
+                    }
+                });
+            };
+
             while (true)
             {
                 try
                 {
-                    string name = GetValidStringInput("Enter customer name: ");
-                    string product = GetValidStringInput("Enter product name: ");
-                    int qty = GetValidIntInput("Enter quantity: ");
+                    string name = ConsoleHelper.GetValidStringInput("Enter customer name: ");
+                    string product = ConsoleHelper.GetValidStringInput("Enter product name: ");
+                    long qty = ConsoleHelper.GetValidLongInput("Enter quantity: ");
 
                     Console.WriteLine("Processing order...");
                     Console.WriteLine("Saving order to database...");
-                    var result = orderService.ProcessOrder(name, product, qty);
+                    var result = await orderService.ProcessOrderAsync(name, product, qty, cts.Token);
 
                     if (result.IsSuccess)
                     {
                         var order = result.Value;
-                        WriteSuccess("Order complete!");
-                        WriteSuccess("Customer: " + order.CustomerName);
-                        WriteSuccess("Product: " + order.ProductName);
-                        WriteSuccess("Quantity: " + order.Quantity);
-                        WriteSuccess("Total: $" + order.Quantity * order.Price);
+                        ConsoleHelper.WriteSuccess("Order complete!");
+                        ConsoleHelper.WriteSuccess("Customer: " + order.CustomerName);
+                        ConsoleHelper.WriteSuccess("Product: " + order.ProductName);
+                        ConsoleHelper.WriteSuccess("Quantity: " + order.Quantity);
+                        ConsoleHelper.WriteSuccess("Total: $" + order.Quantity * order.Price);
                     }
                     else
                     {
-                        WriteWarning($"Order Failed: {result.ErrorMessage}");
+                        ConsoleHelper.WriteWarning($"Order Failed: {result.ErrorMessage}");
                     }
-                  
+
                     Console.Write("Do you want to process another order? (y/n): ");
-                    
+
                     string? choice = Console.ReadLine();
                     if (string.IsNullOrWhiteSpace(choice) || !choice.Trim().Equals("y", StringComparison.OrdinalIgnoreCase))
                     {
@@ -74,67 +108,18 @@ namespace LegacyOrderService
                         break;
                     }
                 }
+                catch (OperationCanceledException)
+                {
+                    ConsoleHelper.WriteError("Operation canceled by user.");
+                    break;
+                }
                 catch (Exception)
                 {
-                    WriteError("Something went wrong. Please check logs.");
+                    ConsoleHelper.WriteError("Something went wrong. Please check logs.");
                 }
             }
 
             Log.CloseAndFlush();
-        }
-
-        static string GetValidStringInput(string prompt)
-        {
-            string? input = "";
-            while (string.IsNullOrWhiteSpace(input))
-            {
-                Console.Write(prompt);
-                input = Console.ReadLine();
-            }
-            return input;
-        }
-
-        static int GetValidIntInput(string prompt)
-        {
-            while (true)
-            {
-                Console.Write(prompt);
-                string? input = Console.ReadLine();
-
-                if (int.TryParse(input, out int value))
-                {
-                    if (value > 0)
-                    {
-                        return value;
-                    }
-                    Console.WriteLine("Quantity must be greater than 0.");
-                }
-                else
-                {
-                    Console.WriteLine("Invalid input. Please enter a valid number.");
-                }
-            }
-        }
-
-        static void WriteSuccess(string message)
-        {
-            Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine(message);
-            Console.ResetColor();
-        }
-
-        static void WriteWarning(string message)
-        {
-            Console.ForegroundColor = ConsoleColor.Yellow;
-            Console.WriteLine(message);
-            Console.ResetColor();
-        }
-
-        static void WriteError(string message)
-        {
-            Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine(message);
-            Console.ResetColor();
         }
     }
 }
