@@ -84,6 +84,18 @@ cd ../..
 dotnet test
 ```
 
+### 4. Database Scalability
+Current State: The application uses SQLite for portability and ease of review (zero-configuration).
+
+Future Roadmap: Thanks to EF Core abstraction, migrating to a robust RDBMS (SQL Server/PostgreSQL) for production requires minimal changes:
+
+Change the NuGet package (e.g., Microsoft.EntityFrameworkCore.SqlServer).
+Update Program.cs to use .UseSqlServer().
+
+Update Connection String in appsettings.json.
+
+Regenerate Migrations (due to syntax differences in raw SQL scripts).
+
 ## 📂 Project Structure
 
 ```
