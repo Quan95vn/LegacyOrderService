@@ -38,7 +38,7 @@ public class OrderServiceTests
         // ARRANGE
         string customerName = _faker.Name.FullName();      
         string productName = _faker.Commerce.ProductName(); 
-        int quantity = _faker.Random.Int(1, 10);          
+        long quantity = _faker.Random.Long(1, 10);          
         double price = double.Parse(_faker.Commerce.Price(10, 100));
 
         // Setup Mock
@@ -61,7 +61,7 @@ public class OrderServiceTests
         // ARRANGE
         var customerName = _faker.Name.FullName();
         var productName = _faker.Commerce.ProductName(); 
-        var quantity = _faker.Random.Int(1, 10);
+        var quantity = _faker.Random.Long(1, 10);
 
         // Setup Mock
         _mockProductRepo
@@ -83,7 +83,7 @@ public class OrderServiceTests
         // ARRANGE
         var customerName = _faker.Name.FullName();
         var productName = _faker.Commerce.ProductName();
-        var quantity = _faker.Random.Int(1, 5);
+        var quantity = _faker.Random.Long(1, 5);
         var price = double.Parse(_faker.Commerce.Price(10, 500));
 
         var randomErrorMessage = _faker.Lorem.Sentence();

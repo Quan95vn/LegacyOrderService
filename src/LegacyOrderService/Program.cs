@@ -58,7 +58,7 @@ namespace LegacyOrderService
                 {
                     string name = GetValidStringInput("Enter customer name: ");
                     string product = GetValidStringInput("Enter product name: ");
-                    int qty = GetValidIntInput("Enter quantity: ");
+                    long qty = GetValidLongInput("Enter quantity: ");
 
                     Console.WriteLine("Processing order...");
                     Console.WriteLine("Saving order to database...");
@@ -107,14 +107,14 @@ namespace LegacyOrderService
             return input;
         }
 
-        static int GetValidIntInput(string prompt)
+        static long GetValidLongInput(string prompt)
         {
             while (true)
             {
                 Console.Write(prompt);
                 string? input = Console.ReadLine();
 
-                if (int.TryParse(input, out int value))
+                if (long.TryParse(input, out long value))
                 {
                     if (value > 0)
                     {
@@ -128,6 +128,8 @@ namespace LegacyOrderService
                 }
             }
         }
+
+
 
         static void WriteSuccess(string message)
         {

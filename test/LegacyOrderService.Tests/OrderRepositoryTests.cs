@@ -24,7 +24,7 @@ public class OrderRepositoryTests
         _orderFaker = new Faker<Order>()
             .RuleFor(o => o.CustomerName, f => f.Name.FullName())
             .RuleFor(o => o.ProductName, f => f.Commerce.ProductName())
-            .RuleFor(o => o.Quantity, f => f.Random.Int(1, 10))
+            .RuleFor(o => o.Quantity, f => f.Random.Long(1, 10))
             .RuleFor(o => o.Price, f => double.Parse(f.Commerce.Price(10, 100)));
     }
 

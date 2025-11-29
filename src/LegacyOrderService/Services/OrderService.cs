@@ -21,7 +21,7 @@ public class OrderService
         _logger = logger;
     }
 
-    public Result<Order> ProcessOrder(string customerName, string productName, int quantity)
+    public Result<Order> ProcessOrder(string customerName, string productName, long quantity)
     {
         try
         {
@@ -42,7 +42,7 @@ public class OrderService
             };
             _orderRepo.Save(order);
 
-            double total = order.Quantity * order.Price;
+            double total = order.TotalAmount;
             _logger.LogInformation("Order processed successfully for Customer: {Customer}, Product: {Product}, Quantity: {Quantity}, Total Amount: ${TotalAmount}", 
                 customerName, productName, quantity, total);
 
