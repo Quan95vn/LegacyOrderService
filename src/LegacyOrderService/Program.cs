@@ -32,7 +32,7 @@ namespace LegacyOrderService
                 builder.ClearProviders();
                 builder.AddSerilog();
             });
-
+            services.AddSingleton<IConfiguration>(configuration);
             services.AddDbContext<OrderDbContext>(options =>
                 options.UseSqlite(configuration.GetConnectionString("DefaultConnection")));
 
