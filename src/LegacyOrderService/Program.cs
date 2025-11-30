@@ -15,24 +15,27 @@ namespace LegacyOrderService
     {
         static async Task Main(string[] args)
         {
+            var environment = Environment.GetEnvironmentVariable("DOTNET_ENVIRONMENT") ?? "Production";
+
             var configuration = new ConfigurationBuilder()
                 .SetBasePath(Directory.GetCurrentDirectory())
                 .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+                .AddJsonFile($"appsettings.{environment}.json", optional: true, reloadOnChange: true)
+                .AddEnvironmentVariables()
                 .Build();
 
             Log.Logger = new LoggerConfiguration()
-                .MinimumLevel.Information()
-                .WriteTo.Console()
-                .WriteTo.File("logs/log-.txt", rollingInterval: RollingInterval.Day)
+                .ReadFrom.Configuration(configuration)
                 .CreateLogger();
 
             var services = new ServiceCollection();
+            services.AddSingleton<IConfiguration>(configuration);
             services.AddLogging(builder =>
             {
                 builder.ClearProviders();
                 builder.AddSerilog();
             });
-
+           
             services.AddDbContext<OrderDbContext>(options =>
                 options.UseSqlite(configuration.GetConnectionString("DefaultConnection")));
 
@@ -42,13 +45,12 @@ namespace LegacyOrderService
 
             var serviceProvider = services.BuildServiceProvider();
 
-            await SeedDataExtensions.SeedDataAsync(serviceProvider);
-
             var orderService = serviceProvider.GetRequiredService<OrderService>();
             var appLogger = serviceProvider.GetRequiredService<ILogger<Program>>();
-
             appLogger.LogInformation("Application Starting...");
-            Console.WriteLine("Welcome to Order Processor!");
+            ConsoleHelper.PrintWelcome();
+
+            await SeedDataExtensions.SeedDataAsync(serviceProvider);
 
             using var cts = new CancellationTokenSource();
 
@@ -90,7 +92,7 @@ namespace LegacyOrderService
                         var order = result.Value;
                         ConsoleHelper.WriteSuccess("Order complete!");
                         ConsoleHelper.WriteSuccess("Customer: " + order.CustomerName);
-                        ConsoleHelper.WriteSuccess("Product: " + order.ProductName);
+                        ConsoleHelper.WriteSuccess("Product: " + order.Product.Name);
                         ConsoleHelper.WriteSuccess("Quantity: " + order.Quantity);
                         ConsoleHelper.WriteSuccess("Total: $" + order.Quantity * order.Price);
                     }

@@ -14,5 +14,25 @@ public class OrderDbContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        modelBuilder.Entity<Order>(entity =>
+        {
+            entity.HasKey(o => o.Id);
+
+           
+            entity.HasOne(o => o.Product)    
+                  .WithMany()                  
+                  .HasForeignKey(o => o.ProductId) 
+                  .IsRequired()               
+                  .OnDelete(DeleteBehavior.Restrict); 
+
+            entity.Property(o => o.CustomerName).IsRequired();
+            entity.Property(o => o.Price).HasColumnType("REAL"); 
+        });
+
+        modelBuilder.Entity<Product>(entity =>
+        {
+            entity.HasKey(p => p.Id);
+            entity.Property(p => p.Name).IsRequired();
+        });
     }
 }
