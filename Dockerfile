@@ -2,6 +2,9 @@ FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 
 COPY *.sln .
+
+COPY Directory.Build.props .
+COPY Directory.Packages.props .
 COPY src/LegacyOrderService/*.csproj ./src/LegacyOrderService/
 COPY test/LegacyOrderService.Tests/*.csproj ./test/LegacyOrderService.Tests/
 
