@@ -71,6 +71,14 @@ For Windows (Command Prompt - CMD):
 docker run -it --rm -v %cd%\src\LegacyOrderService\LocalDb:/app/LocalDb orderservice:latest
 ```
 
+### Advanced Docker Usage
+**Run in Development Mode:**
+To enable detailed logging (including SQL queries) provided by `appsettings.Development.json`:
+
+```bash
+docker run -it --rm -e DOTNET_ENVIRONMENT=Development -v ${PWD}/src/LegacyOrderService/LocalDb:/app/LocalDb orderservice:latest
+```
+
 ### 3. Run Tests
 
 ```bash
