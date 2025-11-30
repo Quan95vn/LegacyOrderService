@@ -27,11 +27,13 @@ public class OrderService
         long quantity,
         CancellationToken cancellationToken = default)
     {
+        cancellationToken.ThrowIfCancellationRequested();
+
         try
         {
-            double? price = await _productRepo.GetPriceAsync(productName, cancellationToken);
+            var product = await _productRepo.GetByNameAsync(productName, cancellationToken);
 
-            if (price == null)
+            if (product == null)
             {
                 _logger.LogWarning("Product not found: {ProductName}", productName);
                 return Result<Order>.Failure($"Product '{productName}' does not exist.");
@@ -40,9 +42,10 @@ public class OrderService
             var order = new Order
             {
                 CustomerName = customerName,
-                ProductName = productName,
+                ProductId = product.Id,
+                Product = product,
                 Quantity = quantity,
-                Price = price.Value
+                Price = product.Price
             };
             await _orderRepo.SaveAsync(order, cancellationToken);
 
