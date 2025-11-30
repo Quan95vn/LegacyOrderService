@@ -90,7 +90,7 @@ namespace LegacyOrderService
                         var order = result.Value;
                         ConsoleHelper.WriteSuccess("Order complete!");
                         ConsoleHelper.WriteSuccess("Customer: " + order.CustomerName);
-                        ConsoleHelper.WriteSuccess("Product: " + order.ProductName);
+                        ConsoleHelper.WriteSuccess("Product: " + order.Product.Name);
                         ConsoleHelper.WriteSuccess("Quantity: " + order.Quantity);
                         ConsoleHelper.WriteSuccess("Total: $" + order.Quantity * order.Price);
                     }

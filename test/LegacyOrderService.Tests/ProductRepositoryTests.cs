@@ -36,7 +36,7 @@ public class ProductRepositoryTests
     }
 
     [Fact]
-    public async Task GetPrice_GivenExistingProduct_ShouldReturnCorrectPrice()
+    public async Task GetByName_GivenExistingProduct_ShouldReturnProductEntity()
     {
         // ARRANGE
         var availableProducts = ProductSeedData.Products.Keys.ToList();
@@ -44,23 +44,25 @@ public class ProductRepositoryTests
         var expectedPrice = ProductSeedData.Products[productName];
 
         // ACT
-        var result = await _repo.GetPriceAsync(productName, It.IsAny<CancellationToken>());
+        var result = await _repo.GetByNameAsync(productName, CancellationToken.None);
 
         // ASSERT
-        Assert.NotNull(result);
-        Assert.Equal(expectedPrice, result);
+        Assert.NotNull(result);          
+        Assert.Equal(productName, result.Name);
+        Assert.Equal(expectedPrice, result.Price); 
+        Assert.True(result.Id > 0);     
     }
 
     [Fact]
-    public async Task GetPrice_GivenNonExistentProduct_ShouldReturnNull()
+    public async Task GetByName_GivenNonExistentProduct_ShouldReturnNull()
     {
         // ARRANGE
         var randomProduct = _faker.Commerce.ProductName();
 
         // ACT
-        var result = await _repo.GetPriceAsync(randomProduct, It.IsAny<CancellationToken>());
+        var result = await _repo.GetByNameAsync(randomProduct, CancellationToken.None);
 
         // ASSERT
-        Assert.Null(result);
+        Assert.Null(result); 
     }
 }
