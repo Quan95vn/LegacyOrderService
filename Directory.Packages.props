@@ -1,33 +1,33 @@
 <Project>
-    <PropertyGroup>
-        <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
-    </PropertyGroup>
+  <PropertyGroup>
+    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+  </PropertyGroup>
 
-    <ItemGroup>
-        <PackageVersion Include="Microsoft.Data.Sqlite" Version="8.0.22" />
-        <PackageVersion Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.22">
-            <PrivateAssets>all</PrivateAssets>
-            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-        </PackageVersion>
-        <PackageVersion Include="Microsoft.EntityFrameworkCore.Sqlite" Version="8.0.22" />
-        <PackageVersion Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="8.0.0" />
-        <PackageVersion Include="Microsoft.Extensions.Configuration.Json" Version="8.0.1" />
-        <PackageVersion Include="Microsoft.Extensions.DependencyInjection" Version="8.0.1" />
-        <PackageVersion Include="Microsoft.Extensions.Logging" Version="8.0.1" />
-        <PackageVersion Include="Serilog.Extensions.Hosting" Version="8.0.0" />
-        <PackageVersion Include="Serilog.Settings.Configuration" Version="8.0.4" />
-        <PackageVersion Include="Serilog.Sinks.Console" Version="6.1.1" />
-        <PackageVersion Include="Serilog.Sinks.File" Version="7.0.0" />
-
-        <PackageVersion Include="Bogus" Version="35.6.5" />
-        <PackageVersion Include="coverlet.collector" Version="6.0.0" />
-        <PackageVersion Include="Microsoft.EntityFrameworkCore.InMemory" Version="8.0.22" />
-        <PackageVersion Include="Microsoft.Extensions.Logging.Abstractions" Version="8.0.2" />
-        <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.8.0" />
-        <PackageVersion Include="Moq" Version="4.20.72" />
-        <PackageVersion Include="xunit" Version="2.5.3" />
-        <PackageVersion Include="xunit.runner.visualstudio" Version="2.5.3" />
+  <ItemGroup>
+  <PackageVersion Include="Microsoft.Data.Sqlite" Version="8.0.22" />
+	<PackageVersion Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.22">
+	  <PrivateAssets>all</PrivateAssets>
+	  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+	</PackageVersion>
+	<PackageVersion Include="Microsoft.EntityFrameworkCore.Sqlite" Version="8.0.22" />
+	<PackageVersion Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="8.0.0" />
+	<PackageVersion Include="Microsoft.Extensions.Configuration.Json" Version="8.0.1" />
+	<PackageVersion Include="Microsoft.Extensions.DependencyInjection" Version="8.0.1" />
+	<PackageVersion Include="Microsoft.Extensions.Logging" Version="8.0.1" />
+	<PackageVersion Include="Serilog.Extensions.Hosting" Version="8.0.0" />
+	<PackageVersion Include="Serilog.Settings.Configuration" Version="8.0.4" />
+	<PackageVersion Include="Serilog.Sinks.Console" Version="6.1.1" />
+	<PackageVersion Include="Serilog.Sinks.File" Version="7.0.0" />
+	
+	<PackageVersion Include="Bogus" Version="35.6.5" />
+	<PackageVersion Include="coverlet.collector" Version="6.0.0" />
+	<PackageVersion Include="Microsoft.EntityFrameworkCore.InMemory" Version="8.0.22" />
+	<PackageVersion Include="Microsoft.Extensions.Logging.Abstractions" Version="8.0.2" />
+	<PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.8.0" />
+	<PackageVersion Include="Moq" Version="4.20.72" />
+	<PackageVersion Include="xunit" Version="2.5.3" />
+	<PackageVersion Include="xunit.runner.visualstudio" Version="2.5.3" />
         <PackageVersion Include="System.Net.Http" Version="4.3.4" />
         <PackageVersion Include="System.Text.RegularExpressions" Version="4.3.1" />
-    </ItemGroup>
+  </ItemGroup>
 </Project>
