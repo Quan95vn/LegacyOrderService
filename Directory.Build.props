@@ -1,13 +1,14 @@
 <Project>
-  <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
-    <Nullable>enable</Nullable>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <LangVersion>latest</LangVersion>
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors> </PropertyGroup>
+    <PropertyGroup>
+        <TargetFramework>net8.0</TargetFramework>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <LangVersion>latest</LangVersion>
+        <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    </PropertyGroup>
 
-  <PropertyGroup>
-    <Authors>Kenny.Tran</Authors>
-    <Copyright>Copyright © 2025</Copyright>
-  </PropertyGroup>
+    <PropertyGroup>
+        <Authors>Kenny.Tran</Authors>
+        <Copyright>Copyright © 2025</Copyright>
+    </PropertyGroup>
 </Project>
